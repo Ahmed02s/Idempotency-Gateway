@@ -16,6 +16,11 @@ Built for **FinSafe Transactions Ltd.**
 
 ## Architecture Diagram
 
+
+
+<img src="idempotency_gateway_architecture.svg" width="400" style="background-color:white; padding:10px;">
+
+
 ### Request Decision Flowchart
 
 ```
