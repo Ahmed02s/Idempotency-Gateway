@@ -1,5 +1,13 @@
 # Idempotency Gateway — The "Pay-Once" Protocol
 
+## Live Demo
+
+| | URL |
+|---|---|
+| **Live API** | https://idempotency-gateway-production.up.railway.app |
+| **Swagger UI** | https://idempotency-gateway-production.up.railway.app/docs |
+| **Health Check** | https://idempotency-gateway-production.up.railway.app/health |
+
 A production-ready Python/FastAPI service that guarantees every payment is processed **exactly once**, regardless of how many times a client retries.
 
 Built for **FinSafe Transactions Ltd.**
