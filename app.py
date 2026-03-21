@@ -22,7 +22,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
-# ── Configuration (overridable via environment variables) ─────────────────────
+# ── Configuration (overridable via environment variables) ───────────────────
 KEY_TTL_SECONDS: int      = int(os.getenv("KEY_TTL_SECONDS", 86_400))
 CLEANUP_INTERVAL: int     = int(os.getenv("CLEANUP_INTERVAL_SECONDS", 300))
 PROCESSING_DELAY: float   = float(os.getenv("PROCESSING_DELAY_SECONDS", 2.0))
