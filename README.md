@@ -180,9 +180,9 @@ Process a payment. Guaranteed to charge exactly once per unique `Idempotency-Key
 
 | Header              | Required | Description                                       |
 |---------------------|----------|---------------------------------------------------|
-| `Idempotency-Key`   | ✅ Yes    | Unique string (UUID recommended), max 255 chars   |
-| `Content-Type`      | ✅ Yes    | `application/json`                                |
-
+| `Idempotency-Key`   | Yes      | Unique string (UUID recommended), max 255 chars   |
+| `Content-Type`      | Yes      | `application/json`                                |
+ 
 #### Request Body
 
 ```json
@@ -203,7 +203,7 @@ Process a payment. Guaranteed to charge exactly once per unique `Idempotency-Key
 
 ```json
 {
-  "message": "Charged 100.0 GHS",
+  "message": "Charged 100 GHS",
   "idempotency_key": "550e8400-e29b-41d4-a716-446655440000",
   "amount": 100.0,
   "currency": "GHS",
@@ -346,12 +346,12 @@ async def _cleanup_expired_keys() -> None:
 
 | User Story | Tests | Result |
 |---|---|---|
-| US1 — Happy Path | 9 | ✅ All pass |
-| US2 — Duplicate / Cache Hit | 5 | ✅ All pass |
-| US3 — Conflict Detection | 3 | ✅ All pass |
-| Bonus — Race Condition | 2 | ✅ All pass |
-| Developer's Choice — TTL | 4 | ✅ All pass |
-| **Total** | **23** | **✅ 23/23** |
+| US1 — Happy Path | 9 |  All pass |
+| US2 — Duplicate / Cache Hit | 5 | All pass |
+| US3 — Conflict Detection | 3 |  All pass |
+| Bonus — Race Condition | 2 |  All pass |
+| Developer's Choice — TTL | 4 |  All pass |
+| **Total** | **23** | **23/23** |
 
 ---
 
