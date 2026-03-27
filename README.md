@@ -274,25 +274,65 @@ Identical body to the original response. No payment is processed again.
 
 ### Example cURL Calls
 
-```bash
+```powershell
+
 # First payment
-curl -X POST http://localhost:8000/process-payment \
-  -H "Content-Type: application/json" \
-  -H "Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000" \
-  -d '{"amount": 100, "currency": "GHS"}'
+Invoke-RestMethod -Uri "http://localhost:8000/process-payment" `
+  -Method POST `
+  -Headers @{"Idempotency-Key" = "test-key-001"; "Content-Type" = "application/json"} `
+  -Body '{"amount": 100, "currency": "GHS"}'
 
-# Retry — returns cached response + X-Cache-Hit: true
-curl -X POST http://localhost:8000/process-payment \
-  -H "Content-Type: application/json" \
-  -H "Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000" \
-  -d '{"amount": 100, "currency": "GHS"}'
+ #Duplicate Request (Same Key + Same Body)
+Invoke-RestMethod -Uri "http://localhost:8000/process-payment" `
+  -Method POST `
+  -Headers @{"Idempotency-Key" = "test-key-001"; "Content-Type" = "application/json"} `
+  -Body '{"amount": 100, "currency": "GHS"}'
 
-# Conflict — same key, different amount
-curl -X POST http://localhost:8000/process-payment \
-  -H "Content-Type: application/json" \
-  -H "Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000" \
-  -d '{"amount": 500, "currency": "GHS"}'
-# → 409 Conflict
+#Conflict (Same Key + Different Amount)
+Invoke-RestMethod -Uri "http://localhost:8000/process-payment" `
+  -Method POST `
+  -Headers @{"Idempotency-Key" = "test-key-001"; "Content-Type" = "application/json"} `
+  -Body '{"amount": 500, "currency": "GHS"}'
+
+#Missing Idempotency-Key Header
+Invoke-RestMethod -Uri "http://localhost:8000/process-payment" `
+  -Method POST `
+  -Headers @{"Content-Type" = "application/json"} `
+  -Body '{"amount": 100, "currency": "GHS"}'
+
+#Invalid Amount (Zero)
+Invoke-RestMethod -Uri "http://localhost:8000/process-payment" `
+  -Method POST `
+  -Headers @{"Idempotency-Key" = "test-key-002"; "Content-Type" = "application/json"} `
+  -Body '{"amount": 0, "currency": "GHS"}'
+
+#Invalid Amount (Negative)
+Invoke-RestMethod -Uri "http://localhost:8000/process-payment" `
+  -Method POST `
+  -Headers @{"Idempotency-Key" = "test-key-003"; "Content-Type" = "application/json"} `
+  -Body '{"amount": -50, "currency": "GHS"}'
+
+#Unsupported Currency
+  Invoke-RestMethod -Uri "http://localhost:8000/process-payment" `
+  -Method POST `
+  -Headers @{"Idempotency-Key" = "test-key-004"; "Content-Type" = "application/json"} `
+  -Body '{"amount": 100, "currency": "XYZ"}'
+
+#Different Currency Same Key
+Invoke-RestMethod -Uri "http://localhost:8000/process-payment" `
+  -Method POST `
+  -Headers @{"Idempotency-Key" = "test-key-001"; "Content-Type" = "application/json"} `
+  -Body '{"amount": 100, "currency": "USD"}'
+  
+# Race Condition (Run all at once)
+$job1 = Start-Job { Invoke-RestMethod -Uri "http://localhost:8000/process-payment" -Method POST -Headers @{"Idempotency-Key" = "race-key-001"; "Content-Type" = "application/json"} -Body '{"amount": 150, "currency": "NGN"}' }
+$job2 = Start-Job { Invoke-RestMethod -Uri "http://localhost:8000/process-payment" -Method POST -Headers @{"Idempotency-Key" = "race-key-001"; "Content-Type" = "application/json"} -Body '{"amount": 150, "currency": "NGN"}' }
+$job3 = Start-Job { Invoke-RestMethod -Uri "http://localhost:8000/process-payment" -Method POST -Headers @{"Idempotency-Key" = "race-key-001"; "Content-Type" = "application/json"} -Body '{"amount": 150, "currency": "NGN"}' }
+
+Receive-Job $job1 -Wait
+Receive-Job $job2 -Wait
+Receive-Job $job3 -Wait
+
 ```
 
 ---
